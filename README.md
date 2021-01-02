@@ -36,17 +36,21 @@ string|[StringLoader](https://github.com/rds1983/AssetManagementBase/blob/master
 byte[]|[ByteArrayLoader](https://github.com/rds1983/AssetManagementBase/blob/master/src/ByteArrayLoader.cs)|Loads any resource as byte array
 
 # Custom Asset Types
-It is possible to make AssetManagementBase use custom asset loaders by marking custom types with attribute AssetLoaderAttribute.
-
-I.e. following code makes it so UserProfile class will be loaded by UserProfileLoader:
-```c#
+It is possible to extend this list using two ways:
+1. Mark a custom type with the attribute AssetLoaderAttribute. I.e.
+  ```c#
     [AssetLoader(typeof(UserProfileLoader))]
     public class UserProfile
     {
         public string Name;
         public int Score;
     }
-```
+  ```
+
+ 2. Calling static method AssetManager.SetAssetManager. I.e.
+  ```c#
+    AssetManager.SetAssetLoader(new UserProfileLoader());
+  ```
 
 Now let's say that we store user profiles as xml files that look like following:
 ```xml
