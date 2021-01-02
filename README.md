@@ -7,7 +7,7 @@ AssetManagementBase is basic asset management library.
 https://www.nuget.org/packages/AssetManagementBase
     
 # Creating AssetManager
-In order to create AssetManager [IAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/Assets/IAssetResolver.cs) parameter must be passed to the constructor. Latter is simple interface that opens asset stream by its name.
+In order to create AssetManager [IAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/IAssetResolver.cs) parameter must be passed to the constructor.
 
 AssetManagementBase provides 2 implementation of IAssetResolver:
   * [FileAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/FileAssetResolver.cs) that opens Stream using File.OpenRead. Sample AssetManager creation code:
