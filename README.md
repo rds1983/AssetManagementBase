@@ -36,7 +36,7 @@ string|[StringLoader](https://github.com/rds1983/AssetManagementBase/blob/master
 byte[]|[ByteArrayLoader](https://github.com/rds1983/AssetManagementBase/blob/master/src/ByteArrayLoader.cs)|Loads any resource as byte array
 
 # Custom Asset Types
-It is possible to extend this list using two ways:
+It is possible to extend the above list using two ways:
 1. Mark a custom type with the attribute AssetLoaderAttribute. I.e.
   ```c#
     [AssetLoader(typeof(UserProfileLoader))]
@@ -47,12 +47,12 @@ It is possible to extend this list using two ways:
     }
   ```
 
- 2. Calling static method AssetManager.SetAssetManager. I.e.
+ 2. Call a static method AssetManager.SetAssetManager. I.e.
   ```c#
     AssetManager.SetAssetLoader(new UserProfileLoader());
   ```
 
-Now let's say that we store user profiles as xml files that look like following:
+Now let's provide example code for the above UserProfileLoader. Let's say that we store user profiles as xml files that look like following:
 ```xml
     <?xml version="1.0" encoding="utf-8" ?>
     <UserProfile>
