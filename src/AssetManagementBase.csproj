@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Authors>AssetManagementBaseTeam</Authors>
+    <Product>AssetManagementBase</Product>
+    <Description>Basic Asset Management Framework</Description>
+    <PackageLicenseUrl>https://en.wikipedia.org/wiki/MIT_License</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/rds1983/AssetManagementBase</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <Version>0.5.2.0</Version>
+  </PropertyGroup>
+</Project>
