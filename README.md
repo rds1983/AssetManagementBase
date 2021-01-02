@@ -10,13 +10,13 @@ https://www.nuget.org/packages/AssetManagementBase
 In order to create AssetManager [IAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/Assets/IAssetResolver.cs) parameter must be passed to the constructor. Latter is simple interface that opens asset stream by its name.
 
 AssetManagementBase provides 2 implementation of IAssetResolver:
-  * [FileAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/Assets/FileAssetResolver.cs) that opens Stream using File.OpenRead. Sample AssetManager creation code:
+  * [FileAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/FileAssetResolver.cs) that opens Stream using File.OpenRead. Sample AssetManager creation code:
 ```c#
     FileAssetResolver assetResolver = new FileAssetResolver(Path.Combine(PathUtils.ExecutingAssemblyDirectory, "Assets"));
     AssetManager assetManager = new AssetManager(assetResolver);
 ```
 
-  * [ResourceAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/Assets/ResourceAssetResolver.cs) that opens Stream using Assembly.GetManifestResourceStream. Sample AssetManager creation code:
+  * [ResourceAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/ResourceAssetResolver.cs) that opens Stream using Assembly.GetManifestResourceStream. Sample AssetManager creation code:
 ```c#
     ResourceAssetResolver assetResolver = new ResourceAssetResolver(typeof(MyGame).Assembly, "Resources.");
     AssetManager assetManager = new AssetManager(GraphicsDevice, assetResolver);
