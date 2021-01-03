@@ -23,7 +23,7 @@ AssetManagementBase provides 2 implementation of IAssetResolver:
 ```
 
 # Loading Assets
-After AssetManager is created, it could be used following way to load SpriteFont:
+After AssetManager is created, it could be used following way:
 ```c#
     string data = assetManager.Load<string>("data/mydata.txt");
 ```
