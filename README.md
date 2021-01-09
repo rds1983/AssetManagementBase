@@ -36,23 +36,16 @@ string|[StringLoader](https://github.com/rds1983/AssetManagementBase/blob/master
 byte[]|[ByteArrayLoader](https://github.com/rds1983/AssetManagementBase/blob/master/src/ByteArrayLoader.cs)|Loads any resource as byte array
 
 # Custom Asset Types
-It is possible to extend the above list using two ways:
-1. Mark a custom type with the attribute AssetLoaderAttribute. I.e.
+This guide will demonstrate how to register additional loaders for any types.
+Let's say we have following type:
   ```c#
-    [AssetLoader(typeof(UserProfileLoader))]
     public class UserProfile
     {
         public string Name;
         public int Score;
     }
   ```
-
- 2. Call a static method AssetManager.SetAssetManager. I.e.
-  ```c#
-    AssetManager.SetAssetLoader(new UserProfileLoader());
-  ```
-
-Now let's provide example code for the above UserProfileLoader. Let's say that we store user profiles as xml files that look like following:
+Which we store in following XML:
 ```xml
     <?xml version="1.0" encoding="utf-8" ?>
     <UserProfile>
@@ -61,8 +54,8 @@ Now let's provide example code for the above UserProfileLoader. Let's say that w
     </UserProfile>
 ```
 
-Then UserProfileLoader class should look like this:
-```c#
+First of all, we need to write the loader class:
+  ```c#
 	internal class UserProfileLoader : IAssetLoader<UserProfile>
 	{
 		public UserProfile Load(AssetLoaderContext context, string assetName)
@@ -81,6 +74,19 @@ Then UserProfileLoader class should look like this:
 		}
 	}
 ```
+
+Now there are two ways to register this loader:
+1. Mark the type with the attribute AssetLoaderAttribute. I.e.
+  ```c#
+    [AssetLoader(typeof(UserProfileLoader))]
+    public class UserProfile
+    ...
+  ```
+
+ 2. Call a static method AssetManager.SetAssetManager. I.e.
+  ```c#
+    AssetManager.SetAssetLoader(new UserProfileLoader());
+  ```
 
 Now it should be possible to load user profile with following code:
 ```c#
