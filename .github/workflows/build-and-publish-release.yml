@@ -15,8 +15,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.x'
-    - name: Build AssetManagementBase
-      run: dotnet build src\AssetManagementBase.csproj --configuration Release
+    - name: Build
+      run: dotnet build AssetManagementBase.sln --configuration Release
+    - name: Test
+      run: dotnet test AssetManagementBase.sln
     - name: Install NuGet
       uses: NuGet/setup-nuget@v1
     - name: Publish AssetManagementBase to NuGet
