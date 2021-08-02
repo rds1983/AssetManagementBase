@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 
 namespace AssetManagementBase.Utility
@@ -12,14 +13,16 @@ namespace AssetManagementBase.Utility
 		/// Open assembly resource stream by relative name
 		/// </summary>
 		/// <param name="assembly"></param>
-		/// <param name="assetName"></param>
+		/// <param name="path"></param>
 		/// <returns></returns>
-		public static Stream OpenResourceStream(this Assembly assembly, string assetName)
+		public static Stream OpenResourceStream(this Assembly assembly, string path)
 		{
-			var path = assembly.GetName().Name + "." + assetName;
-
 			// Once you figure out the name, pass it in as the argument here.
 			var stream = assembly.GetManifestResourceStream(path);
+			if (stream == null)
+			{
+				throw new Exception($"Could not find resource at path '{path}'");
+			}
 
 			return stream;
 		}
@@ -28,12 +31,12 @@ namespace AssetManagementBase.Utility
 		/// Reads assembly resource as byte array by relative name
 		/// </summary>
 		/// <param name="assembly"></param>
-		/// <param name="assetName"></param>
+		/// <param name="path"></param>
 		/// <returns></returns>
-		public static byte[] ReadResourceAsBytes(this Assembly assembly, string assetName)
+		public static byte[] ReadResourceAsBytes(this Assembly assembly, string path)
 		{
 			var ms = new MemoryStream();
-			using (var input = assembly.OpenResourceStream(assetName))
+			using (var input = assembly.OpenResourceStream(path))
 			{
 				input.CopyTo(ms);
 
@@ -45,12 +48,12 @@ namespace AssetManagementBase.Utility
 		/// Reads assembly resource as string by relative name
 		/// </summary>
 		/// <param name="assembly"></param>
-		/// <param name="assetName"></param>
+		/// <param name="path"></param>
 		/// <returns></returns>
-		public static string ReadResourceAsString(this Assembly assembly, string assetName)
+		public static string ReadResourceAsString(this Assembly assembly, string path)
 		{
 			string result;
-			using (var input = assembly.OpenResourceStream(assetName))
+			using (var input = assembly.OpenResourceStream(path))
 			{
 				using (var textReader = new StreamReader(input))
 				{

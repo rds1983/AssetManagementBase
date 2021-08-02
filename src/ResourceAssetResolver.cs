@@ -26,10 +26,24 @@ namespace AssetManagementBase
 
 		public string Prefix { get; set; }
 
-		public ResourceAssetResolver(Assembly assembly, string prefix)
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="assembly"></param>
+		/// <param name="prefix"></param>
+		/// <param name="prependAssemblyName"></param>
+		public ResourceAssetResolver(Assembly assembly, string prefix, bool prependAssemblyName = true)
 		{
 			Assembly = assembly;
-			Prefix = prefix;
+
+			if (prependAssemblyName)
+			{
+				Prefix = assembly.GetName().Name + "." + prefix;
+			}
+			else
+			{
+				Prefix = prefix;
+			}
 
 			if (!Prefix.EndsWith("."))
 			{

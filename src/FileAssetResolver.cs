@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace AssetManagementBase
 {
@@ -21,6 +22,11 @@ namespace AssetManagementBase
 			if (!Path.IsPathRooted(assetName) && !string.IsNullOrEmpty(BaseFolder))
 			{
 				assetName = Path.Combine(BaseFolder, assetName);
+			}
+
+			if (!File.Exists(assetName))
+			{
+				throw new Exception($"Could not find file '{assetName}'");
 			}
 
 			return File.OpenRead(assetName);
