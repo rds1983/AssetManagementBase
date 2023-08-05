@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AssetManagementBase.Utility
 {
-	public static class Reflection
+	internal static class Reflection
 	{
 		public static T FindAttribute<T>(this MemberInfo property) where T : Attribute
 		{

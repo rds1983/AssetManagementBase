@@ -10,9 +10,8 @@ namespace AssetManagementBase.Tests
 		[Test]
 		public void LoadUserProfile()
 		{
-			var resolver = new FileAssetResolver(PathUtils.ExecutingAssemblyDirectory);
-			var assetManager = new AssetManager(resolver);
-			var userProfile = assetManager.Load<UserProfile>("userProfile.xml");
+			var assetManager = AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
+			var userProfile = assetManager.LoadUserProfile("userProfile.xml");
 
 			Assert.AreEqual(userProfile.Name, "AssetManagementBase");
 			Assert.AreEqual(userProfile.Score, 10000);
@@ -21,12 +20,11 @@ namespace AssetManagementBase.Tests
 		[Test]
 		public void WrongPath()
 		{
-			var resolver = new FileAssetResolver(PathUtils.ExecutingAssemblyDirectory);
-			var assetManager = new AssetManager(resolver);
+			var assetManager = AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
 
 			Assert.Throws<Exception>(() =>
 			{
-				var userProfile = assetManager.Load<UserProfile>("userProfile2.xml");
+				var userProfile = assetManager.LoadUserProfile("userProfile2.xml");
 			});
 		}
 	}

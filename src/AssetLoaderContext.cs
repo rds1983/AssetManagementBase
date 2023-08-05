@@ -5,12 +5,13 @@ namespace AssetManagementBase
 {
 	public class AssetLoaderContext
 	{
-		private readonly AssetManager _assetManager;
 		private readonly string _baseFolder;
+
+		public AssetManager AssetManager { get; }
 
 		internal AssetLoaderContext(AssetManager assetManager, string baseFolder)
 		{
-			_assetManager = assetManager ?? throw new Exception("assetManager");
+			AssetManager = assetManager ?? throw new Exception("assetManager");
 			_baseFolder = baseFolder;
 		}
 
@@ -22,7 +23,7 @@ namespace AssetManagementBase
 		/// <returns></returns>
 		public Stream Open(string assetName)
 		{
-			return _assetManager.Open(AssetManager.CombinePath(_baseFolder, assetName));
+			return AssetManager.Open(CombinePath(_baseFolder, assetName));
 		}
 
 		/// <summary>
@@ -59,9 +60,31 @@ namespace AssetManagementBase
 			}
 		}
 
-		public T Load<T>(string assetName)
+		/// <summary>
+		/// Builds path relative to the asset that is being loaded
+		/// </summary>
+		/// <param name="relativePath"></param>
+		/// <returns></returns>
+		public string BuildAbsolutePath(string relativePath) => CombinePath(_baseFolder, relativePath);
+
+		private static string CombinePath(string _base, string url)
 		{
-			return _assetManager.Load<T>(AssetManager.CombinePath(_baseFolder, assetName));
+			if (string.IsNullOrEmpty(_base))
+			{
+				return url;
+			}
+
+			if (string.IsNullOrEmpty(url))
+			{
+				return _base;
+			}
+
+			if (_base[_base.Length - 1] == AssetManager.SeparatorSymbol)
+			{
+				return _base + url;
+			}
+
+			return _base + AssetManager.SeparatorSymbol + url;
 		}
 	}
 }
