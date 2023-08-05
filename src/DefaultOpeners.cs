@@ -9,6 +9,17 @@ namespace AssetManagementBase
 	{
 		public static AssetOpener CreateFileOpener(string baseFolder)
 		{
+			if (string.IsNullOrEmpty(baseFolder))
+			{
+				throw new ArgumentNullException(nameof(baseFolder));
+			}
+
+			// Base folder shouldn't have separator char at the end
+			if (baseFolder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				baseFolder = baseFolder.Substring(0, baseFolder.Length - 1);
+			}
+
 			AssetOpener result = assetName =>
 			{
 				if (AssetManager.SeparatorSymbol != Path.DirectorySeparatorChar)
@@ -16,10 +27,10 @@ namespace AssetManagementBase
 					assetName = assetName.Replace(AssetManager.SeparatorSymbol, Path.DirectorySeparatorChar);
 				}
 
-				if (!Path.IsPathRooted(assetName) && !string.IsNullOrEmpty(baseFolder))
-				{
-					assetName = Path.Combine(baseFolder, assetName);
-				}
+				// Asset name should always have directory separator at the end
+				// While base folder shouldnt
+				// Hence such combine should work
+				assetName = baseFolder + assetName;
 
 				if (!File.Exists(assetName))
 				{
@@ -39,20 +50,23 @@ namespace AssetManagementBase
 			{
 				prefix = assembly.GetName().Name + "." + prefix;
 			}
-			else
-			{
-			}
 
-			if (!prefix.EndsWith("."))
+			// Prefix shouldn't have dot at the end
+			if (prefix.EndsWith("."))
 			{
-				prefix += ".";
+				prefix = prefix.Substring(0, prefix.Length - 1);
 			}
 
 			AssetOpener result = assetName =>
 			{
 				assetName = assetName.Replace(AssetManager.SeparatorSymbol, '.');
 
-				return Res.OpenResourceStream(assembly, prefix + assetName);
+				// Asset name should always have dot at the end
+				// While base folder shouldnt
+				// Hence such combine should work
+				assetName = prefix + assetName;
+
+				return Res.OpenResourceStream(assembly, assetName);
 			};
 
 			return result;
