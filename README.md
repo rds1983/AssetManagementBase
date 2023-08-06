@@ -13,7 +13,7 @@ AssetManager assetManager = AssetManager.CreateFileAssetManager(@"c:\MyGame\Asse
 ```
 
 Creating AssetManager that loads resources:
-```
+```c#
 AssetManager assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources");
 ```
 If _assembly's name is "Assembly.Name" then the above code will create AssetManager that loads resourcies with prefix "Assembly.Name.Prefix.".
