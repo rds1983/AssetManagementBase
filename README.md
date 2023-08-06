@@ -1,42 +1,36 @@
-# AssetManagementBase
+### AssetManagementBase
 [![NuGet](https://img.shields.io/nuget/v/AssetManagementBase.svg)](https://www.nuget.org/packages/AssetManagementBase/) [![Chat](https://img.shields.io/discord/628186029488340992.svg)](https://discord.gg/ZeHxhCY)
 
-AssetManagementBase is basic asset management library.
+AssetManagementBase is basic C# asset management library that isn't tied to any particular game engine.
 
-# Adding Reference
+### Adding Reference
 https://www.nuget.org/packages/AssetManagementBase
     
-# Creating AssetManager
-In order to create AssetManager [IAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/IAssetResolver.cs) parameter must be passed to the constructor.
-
-AssetManagementBase provides 2 implementation of IAssetResolver:
-  * [FileAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/FileAssetResolver.cs) that opens Stream using File.OpenRead. Sample AssetManager creation code:
+### Creating AssetManager
+Creating AssetManager that loads files:
 ```c#
-    FileAssetResolver assetResolver = new FileAssetResolver(Path.Combine(PathUtils.ExecutingAssemblyDirectory, "Assets"));
-    AssetManager assetManager = new AssetManager(assetResolver);
+AssetManager assetManager = AssetManager.CreateFileAssetManager(@"c:\MyGame\Assets");
 ```
 
-  * [ResourceAssetResolver](https://github.com/rds1983/AssetManagementBase/blob/master/src/ResourceAssetResolver.cs) that opens Stream using Assembly.GetManifestResourceStream. Sample AssetManager creation code:
+Creating AssetManager that loads resources:
+```
+AssetManager assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources");
+```
+If _assembly's name is "Assembly.Name" then the above code will create AssetManager that loads resourcies with prefix "Assembly.Name.Prefix.".
+
+If we don't the assembly's name prepended to the prefix, then pass 'false' as the third param when calling CreateResourceAssetManager. I.e.
 ```c#
-    ResourceAssetResolver assetResolver = new ResourceAssetResolver(typeof(MyGame).Assembly, "Resources.");
-    AssetManager assetManager = new AssetManager(GraphicsDevice, assetResolver);
+AssetManager assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Full.Path.Resources", false);
 ```
 
-# Loading Assets
+### Loading Assets
 After AssetManager is created, it could be used following way:
 ```c#
-    string data = assetManager.Load<string>("data/mydata.txt");
+    string data = assetManager.LoadString("data/mydata.txt");
 ```
 
-AssetManagementBase allows to load following asset types out of the box:
-
-Type|AssetLoader Type|Description
-----|----------------|-----------
-string|[StringLoader](https://github.com/rds1983/AssetManagementBase/blob/master/src/StringLoader.cs)|Loads any resource as string
-byte[]|[ByteArrayLoader](https://github.com/rds1983/AssetManagementBase/blob/master/src/ByteArrayLoader.cs)|Loads any resource as byte array
-
-# Custom Asset Types
-This guide will demonstrate how to register additional loaders for any types.
+### Custom Asset Types
+This guide will demonstrate how to expand AssetManager with more loader methods.
 Let's say we have following type:
   ```c#
     public class UserProfile
@@ -54,13 +48,17 @@ Which we store in following XML:
     </UserProfile>
 ```
 
-First of all, we need to write the loader class:
-  ```c#
-	internal class UserProfileLoader : IAssetLoader<UserProfile>
+Now following code will let us to load it through the AssetManager:
+```c#
+using System.Xml.Linq;
+
+namespace AssetManagementBase.Tests
+{
+	public static class AssetManagerExtensions
 	{
-		public UserProfile Load(AssetLoaderContext context, string assetName)
+		private static AssetLoader<UserProfile> _userProfileLoader = (context) =>
 		{
-			var data = context.Load<string>(assetName);
+			var data = context.ReadDataAsString();
 
 			var xDoc = XDocument.Parse(data);
 
@@ -71,24 +69,16 @@ First of all, we need to write the loader class:
 			};
 
 			return result;
-		}
+		};
+
+		public static UserProfile LoadUserProfile(this AssetManager assetManager, string assetName) => assetManager.UseLoader(_userProfileLoader, assetName);
 	}
+}
 ```
 
-Now there are two ways to register this loader:
-1. Mark the type with the attribute AssetLoaderAttribute. I.e.
-  ```c#
-    [AssetLoader(typeof(UserProfileLoader))]
-    public class UserProfile
-    ...
-  ```
-
- 2. Call a static method AssetManager.SetAssetManager. I.e.
-  ```c#
-    AssetManager.SetAssetLoader(new UserProfileLoader());
-  ```
+It consists of delegate(_userProfileLoader) that does the loading and AssetManager's extension method.
 
 Now it should be possible to load user profile with following code:
 ```c#
-  UserProfile userProfile = assetManager.Load<UserProfile>("profile.xml");
+  UserProfile userProfile = assetManager.LoadUserProfile("profile.xml");
 ```  
