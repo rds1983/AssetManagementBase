@@ -5,8 +5,47 @@ using System.Reflection;
 
 namespace AssetManagementBase
 {
+	public struct AssetLoaderContext
+	{
+		public AssetManager Manager;
+		public string Name;
+		public Func<Stream> DataStreamOpener;
+		public object Settings;
+
+		/// <summary>
+		/// Reads asset stream as string
+		/// </summary>
+		/// <returns></returns>
+		public string ReadDataAsString()
+		{
+			string result;
+
+			using (var stream = DataStreamOpener())
+			using (var textReader = new StreamReader(stream))
+			{
+				result = textReader.ReadToEnd();
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Reads asset stream as byte array
+		/// </summary>
+		/// <returns></returns>
+		public byte[] ReadAssetAsByteArray()
+		{
+			using (var stream = DataStreamOpener())
+			using (var ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
+		}
+	}
+
 	public delegate Stream AssetOpener(string assetName);
-	public delegate T AssetLoader<T>(AssetManager assetManager, string assetName, object settings);
+	public delegate T AssetLoader<T>(AssetLoaderContext context);
 
 	public class AssetManager
 	{
@@ -22,65 +61,6 @@ namespace AssetManagementBase
 			_assetOpener = assetOpener ?? throw new ArgumentNullException(nameof(assetOpener));
 		}
 
-		public void ClearCache()
-		{
-			// TODO: resources disposal
-			Cache.Clear();
-		}
-
-		/// <summary>
-		/// Opens a stream specified by asset path
-		/// Throws an exception on failure
-		/// </summary>
-		/// <param name="assetName"></param>
-		/// <returns></returns>
-		public Stream OpenAsset(string assetName)
-		{
-			var path = CombinePath(_currentFolder, assetName);
-
-			var stream = _assetOpener(path);
-			if (stream == null)
-			{
-				throw new Exception(string.Format("Can't open asset {0}", path));
-			}
-
-			return stream;
-		}
-
-		/// <summary>
-		/// Reads specified asset to string
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public string ReadAssetAsText(string path)
-		{
-			string result;
-			using (var input = OpenAsset(path))
-			{
-				using (var textReader = new StreamReader(input))
-				{
-					result = textReader.ReadToEnd();
-				}
-			}
-
-			return result;
-		}
-
-		/// <summary>
-		/// Reads specified asset to string
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public byte[] ReadAssetAsByteArray(string path)
-		{
-			using (var input = OpenAsset(path))
-			using (var ms = new MemoryStream())
-			{
-				input.CopyTo(ms);
-				return ms.ToArray();
-			}
-		}
-
 		public bool HasAsset(string assetName, object settings = null)
 		{
 			assetName = BuildFullPath(assetName);
@@ -89,7 +69,22 @@ namespace AssetManagementBase
 			return Cache.ContainsKey(cacheKey);
 		}
 
-		public T UseLoader<T>(AssetLoader<T> loader, string assetName, object settings = null)
+		private Func<Stream> CreateStreamOpener(string assetName)
+		{
+			return () =>
+			{
+				var stream = _assetOpener(assetName);
+
+				if (stream == null)
+				{
+					throw new Exception(string.Format("Can't open asset {0}", assetName));
+				}
+
+				return stream;
+			};
+		}
+
+		public T UseLoader<T>(AssetLoader<T> loader, string assetName, object settings = null, bool storeInCache = true)
 		{
 			assetName = BuildFullPath(assetName);
 			var cacheKey = BuildCacheKey(assetName, settings);
@@ -107,8 +102,6 @@ namespace AssetManagementBase
 
 			try
 			{
-				var assetFileName = assetName;
-
 				var separatorIndex = assetName.LastIndexOf(SeparatorSymbol);
 				if (separatorIndex != -1)
 				{
@@ -119,15 +112,26 @@ namespace AssetManagementBase
 					}
 				}
 
-				result = loader(this, assetFileName, settings);
+				var context = new AssetLoaderContext
+				{
+					Manager = this,
+					Name = assetName,
+					DataStreamOpener = CreateStreamOpener(assetName),
+					Settings = settings,
+				};
+
+				result = loader(context);
 			}
 			finally
 			{
 				_currentFolder = oldFolder;
 			}
 
-			// Store in cache
-			Cache[cacheKey] = result;
+			if (storeInCache)
+			{
+				// Store in cache
+				Cache[cacheKey] = result;
+			}
 
 			return result;
 		}

@@ -2,10 +2,10 @@
 {
 	public static class DefaultLoaders
 	{
-		private static AssetLoader<string> StringLoader = (context, assetName, settings) => context.ReadAssetAsText(assetName);
-		private static AssetLoader<byte[]> ByteArrayLoader = (context, assetName, settings) => context.ReadAssetAsByteArray(assetName);
+		private static AssetLoader<string> StringLoader = context => context.ReadDataAsString();
+		private static AssetLoader<byte[]> ByteArrayLoader = context => context.ReadAssetAsByteArray();
 
-		public static string LoadString(this AssetManager assetManager, string assetName) => assetManager.UseLoader(StringLoader, assetName);
-		public static byte[] LoadByteArray(this AssetManager assetManager, string assetName) => assetManager.UseLoader(ByteArrayLoader, assetName);
+		public static string LoadString(this AssetManager assetManager, string assetName, bool storeInCache = true) => assetManager.UseLoader(StringLoader, assetName, storeInCache: storeInCache);
+		public static byte[] LoadByteArray(this AssetManager assetManager, string assetName, bool storeInCache = true) => assetManager.UseLoader(ByteArrayLoader, assetName, storeInCache: storeInCache);
 	}
 }
