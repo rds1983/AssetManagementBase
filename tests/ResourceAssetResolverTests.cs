@@ -54,6 +54,12 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Test]
+		public void TestSubFolder()
+		{
+			TestResourceAccess("Resources.", true, "sub/test.txt");
+		}
+
+		[Test]
 		public void TestWithoutPrependAssemblyName()
 		{
 			TestResourceAccess("AssetManagementBase.Tests.Resources", false, "test.txt");
