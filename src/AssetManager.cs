@@ -5,7 +5,7 @@ using System.Reflection;
 namespace AssetManagementBase
 {
 	public delegate Stream AssetOpener(string assetName);
-	public delegate T AssetLoader<T>(AssetManager manager, string assetName, object settings);
+	public delegate T AssetLoader<T>(AssetManager manager, string assetName, IAssetSettings settings, object tag);
 
 	public class AssetManager
 	{
@@ -43,7 +43,7 @@ namespace AssetManagementBase
 		public byte[] ReadAssetAsByteArray(string assetName) => _core.ReadAssetAsByteArray(BuildFullPath(assetName));
 
 
-		public bool HasAsset(string assetName, object settings = null)
+		public bool HasAsset(string assetName, IAssetSettings settings = null)
 		{
 			assetName = BuildFullPath(assetName);
 			var cacheKey = BuildCacheKey(assetName, settings);
@@ -51,7 +51,7 @@ namespace AssetManagementBase
 			return _core.Cache.ContainsKey(cacheKey);
 		}
 
-		public T UseLoader<T>(AssetLoader<T> loader, string assetName, object settings = null, bool storeInCache = true)
+		public T UseLoader<T>(AssetLoader<T> loader, string assetName, IAssetSettings settings = null, object tag = null, bool storeInCache = true)
 		{
 			assetName = BuildFullPath(assetName);
 			var cacheKey = BuildCacheKey(assetName, settings);
@@ -74,7 +74,7 @@ namespace AssetManagementBase
 				}
 			}
 
-			var result = loader(assetManager, assetName, settings);
+			var result = loader(assetManager, assetName, settings, tag);
 
 			if (storeInCache)
 			{
@@ -93,12 +93,12 @@ namespace AssetManagementBase
 			return assetName;
 		}
 
-		private static string BuildCacheKey(string assetName, object settings)
+		private static string BuildCacheKey(string assetName, IAssetSettings settings)
 		{
 			var cacheKey = assetName;
 			if (settings != null)
 			{
-				cacheKey += "|" + settings.ToString();
+				cacheKey += "|" + settings.BuildKey();
 
 			}
 

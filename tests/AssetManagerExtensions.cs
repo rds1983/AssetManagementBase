@@ -4,7 +4,7 @@ namespace AssetManagementBase.Tests
 {
 	public static class AssetManagerExtensions
 	{
-		private static AssetLoader<UserProfile> _userProfileLoader = (manager, assetName, settings) =>
+		private static AssetLoader<UserProfile> _userProfileLoader = (manager, assetName, settings, tag) =>
 		{
 			var data = manager.ReadAssetAsString(assetName);
 
