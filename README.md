@@ -56,9 +56,9 @@ namespace AssetManagementBase.Tests
 {
 	public static class AssetManagerExtensions
 	{
-		private static AssetLoader<UserProfile> _userProfileLoader = (context) =>
+		private static AssetLoader<UserProfile> _userProfileLoader = (manager, assetName, settings, tag) =>
 		{
-			var data = context.ReadDataAsString();
+			var data = manager.ReadAssetAsString(assetName);
 
 			var xDoc = XDocument.Parse(data);
 
