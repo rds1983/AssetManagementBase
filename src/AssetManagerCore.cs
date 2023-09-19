@@ -6,26 +6,28 @@ namespace AssetManagementBase
 {
 	internal class AssetManagerCore
 	{
-		private readonly AssetOpener _assetOpener;
+		private readonly IAssetAccessor _assetAccessor;
 
 		public Dictionary<string, object> Cache { get; } = new Dictionary<string, object>();
 
-		public AssetManagerCore(AssetOpener assetOpener)
+		public AssetManagerCore(IAssetAccessor assetOpener)
 		{
-			_assetOpener = assetOpener ?? throw new ArgumentNullException(nameof(assetOpener));
+			_assetAccessor = assetOpener ?? throw new ArgumentNullException(nameof(assetOpener));
 		}
 
-		public Stream OpenAssetStream(string assetName) => _assetOpener(assetName);
+		public bool Exists(string assetName) => _assetAccessor.Exists(assetName);
+
+		public Stream Open(string assetName) => _assetAccessor.Open(assetName);
 
 		/// <summary>
 		/// Reads asset stream as string
 		/// </summary>
 		/// <returns></returns>
-		public string ReadAssetAsString(string assetName)
+		public string ReadAsString(string assetName)
 		{
 			string result;
 
-			using (var stream = OpenAssetStream(assetName))
+			using (var stream = Open(assetName))
 			using (var textReader = new StreamReader(stream))
 			{
 				result = textReader.ReadToEnd();
@@ -38,9 +40,9 @@ namespace AssetManagementBase
 		/// Reads asset stream as byte array
 		/// </summary>
 		/// <returns></returns>
-		public byte[] ReadAssetAsByteArray(string assetName)
+		public byte[] ReadAsByteArray(string assetName)
 		{
-			using (var stream = OpenAssetStream(assetName))
+			using (var stream = Open(assetName))
 			using (var ms = new MemoryStream())
 			{
 				stream.CopyTo(ms);

@@ -4,7 +4,6 @@ using System.Reflection;
 
 namespace AssetManagementBase
 {
-	public delegate Stream AssetOpener(string assetName);
 	public delegate T AssetLoader<T>(AssetManager manager, string assetName, IAssetSettings settings, object tag);
 
 	public class AssetManager
@@ -17,9 +16,9 @@ namespace AssetManagementBase
 
 		public Dictionary<string, object> Cache => _core.Cache;
 
-		public AssetManager(AssetOpener assetOpener)
+		public AssetManager(IAssetAccessor assetAccesssor)
 		{
-			_core = new AssetManagerCore(assetOpener);
+			_core = new AssetManagerCore(assetAccesssor);
 		}
 
 		internal AssetManager(AssetManagerCore core, string currentFolder)
@@ -28,22 +27,24 @@ namespace AssetManagementBase
 			_currentFolder = currentFolder;
 		}
 
-		public Stream OpenAssetStream(string assetName) => _core.OpenAssetStream(BuildFullPath(assetName));
+		public bool Exists(string assetName) => _core.Exists(BuildFullPath(assetName));
+
+		public Stream Open(string assetName) => _core.Open(BuildFullPath(assetName));
 
 		/// <summary>
 		/// Reads asset stream as string
 		/// </summary>
 		/// <returns></returns>
-		public string ReadAssetAsString(string assetName) => _core.ReadAssetAsString(BuildFullPath(assetName));
+		public string ReadAsString(string assetName) => _core.ReadAsString(BuildFullPath(assetName));
 
 		/// <summary>
 		/// Reads asset stream as byte array
 		/// </summary>
 		/// <returns></returns>
-		public byte[] ReadAssetAsByteArray(string assetName) => _core.ReadAssetAsByteArray(BuildFullPath(assetName));
+		public byte[] ReadAsByteArray(string assetName) => _core.ReadAsByteArray(BuildFullPath(assetName));
 
 
-		public bool HasAsset(string assetName, IAssetSettings settings = null)
+		public bool IsCached(string assetName, IAssetSettings settings = null)
 		{
 			assetName = BuildFullPath(assetName);
 			var cacheKey = BuildCacheKey(assetName, settings);
@@ -131,7 +132,7 @@ namespace AssetManagementBase
 			return _base + SeparatorSymbol + url;
 		}
 
-		public static AssetManager CreateFileAssetManager(string baseFolder) => new AssetManager(DefaultOpeners.CreateFileOpener(baseFolder));
-		public static AssetManager CreateResourceAssetManager(Assembly assembly, string prefix, bool prependAssemblyName = true) => new AssetManager(DefaultOpeners.CreateResourceOpener(assembly, prefix, prependAssemblyName));
+		public static AssetManager CreateFileAssetManager(string baseFolder) => new AssetManager(new FileAssetAccessor(baseFolder));
+		public static AssetManager CreateResourceAssetManager(Assembly assembly, string prefix, bool prependAssemblyName = true) => new AssetManager(new ResourceAssetAccessor(assembly, prefix, prependAssemblyName));
 	}
 }

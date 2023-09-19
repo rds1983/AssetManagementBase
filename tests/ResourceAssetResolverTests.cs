@@ -15,13 +15,13 @@ namespace AssetManagementBase.Tests
 			var text = assetManager.LoadString(assetName);
 			Assert.AreEqual(text, "Test");
 			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.HasAsset(assetName));
+			Assert.IsTrue(assetManager.IsCached(assetName));
 
 			// Test second access of the same resource
 			text = assetManager.LoadString(assetName);
 			Assert.AreEqual(text, "Test");
 			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.HasAsset(assetName));
+			Assert.IsTrue(assetManager.IsCached(assetName));
 		}
 
 		[Test]
@@ -63,6 +63,18 @@ namespace AssetManagementBase.Tests
 		public void TestWithoutPrependAssemblyName()
 		{
 			TestResourceAccess("AssetManagementBase.Tests.Resources", false, "test.txt");
+		}
+
+		[Test]
+		public void TestResourceExistance()
+		{
+			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources.", true);
+
+			Assert.IsTrue(assetManager.Exists("test.txt"));
+			Assert.IsTrue(assetManager.Exists("/test.txt"));
+			Assert.IsTrue(assetManager.Exists("sub/test.txt"));
+			Assert.IsTrue(assetManager.Exists("/sub/test.txt"));
+			Assert.IsFalse(assetManager.Exists("test2.txt"));
 		}
 	}
 }

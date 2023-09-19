@@ -6,6 +6,8 @@ namespace AssetManagementBase.Tests
 	[TestFixture]
 	public class FileAssetResolverTests
 	{
+		private static AssetManager CreateAssetManager() => AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
+
 		private static void TestUserProfile(UserProfile userProfile)
 		{
 			Assert.AreEqual(userProfile.Name, "AssetManagementBase");
@@ -14,18 +16,18 @@ namespace AssetManagementBase.Tests
 
 		private static void TestUserProfile(string assetName)
 		{
-			var assetManager = AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
+			var assetManager = CreateAssetManager();
 			var userProfile = assetManager.LoadUserProfile(assetName);
 
 			TestUserProfile(userProfile);
 			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.HasAsset(assetName));
+			Assert.IsTrue(assetManager.IsCached(assetName));
 
 			// Test second access of the same resource
 			userProfile = assetManager.LoadUserProfile(assetName);
 			TestUserProfile(userProfile);
 			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.HasAsset(assetName));
+			Assert.IsTrue(assetManager.IsCached(assetName));
 		}
 
 		[Test]
@@ -44,12 +46,22 @@ namespace AssetManagementBase.Tests
 		[Test]
 		public void WrongPath()
 		{
-			var assetManager = AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
+			var assetManager = CreateAssetManager();
 
 			Assert.Throws<Exception>(() =>
 			{
 				var userProfile = assetManager.LoadUserProfile("userProfile2.xml");
 			});
+		}
+
+		[Test]
+		public void FileExistance()
+		{
+			var assetManager = CreateAssetManager();
+
+			Assert.IsTrue(assetManager.Exists("userProfile.xml"));
+			Assert.IsTrue(assetManager.Exists("/userProfile.xml"));
+			Assert.IsFalse(assetManager.Exists("userProfile2.xml"));
 		}
 	}
 }

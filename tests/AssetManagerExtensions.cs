@@ -6,7 +6,7 @@ namespace AssetManagementBase.Tests
 	{
 		private static AssetLoader<UserProfile> _userProfileLoader = (manager, assetName, settings, tag) =>
 		{
-			var data = manager.ReadAssetAsString(assetName);
+			var data = manager.ReadAsString(assetName);
 
 			var xDoc = XDocument.Parse(data);
 
