@@ -14,6 +14,7 @@ namespace AssetManagementBase
 		private readonly AssetManagerCore _core;
 		private readonly string _currentFolder = SeparatorString;
 
+		public string CurrentFolder => _currentFolder;
 		public Dictionary<string, object> Cache => _core.Cache;
 
 		public AssetManager(IAssetAccessor assetAccesssor)
