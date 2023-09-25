@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace AssetManagementBase
 {
@@ -91,6 +92,31 @@ namespace AssetManagementBase
 		{
 			assetName = assetName.Replace('\\', SeparatorSymbol);
 			assetName = CombinePath(_currentFolder, assetName);
+
+			if (assetName.Contains(".."))
+			{
+				// Remove ".."
+				var parts = assetName.Split(SeparatorSymbol);
+				var sb = new StringBuilder();
+				sb.Append(SeparatorSymbol);
+
+				var partsStack = new List<string>();
+				for(var i = 0; i < parts.Length; i++)
+				{
+					if (parts[i] == "..")
+					{
+						if (partsStack.Count > 0)
+						{
+							partsStack.RemoveAt(partsStack.Count - 1);
+						}
+					} else if (!string.IsNullOrEmpty(parts[i]))
+					{
+						partsStack.Add(parts[i]);
+					}
+				}
+
+				assetName = SeparatorSymbol + (string.Join(SeparatorString, partsStack));
+			}
 
 			return assetName;
 		}
