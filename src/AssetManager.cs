@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -27,6 +28,11 @@ namespace AssetManagementBase
 		{
 			_core = core;
 			_currentFolder = currentFolder;
+		}
+
+		public void Unload()
+		{
+			Cache.Clear();
 		}
 
 		public bool Exists(string assetName) => _core.Exists(BuildFullPath(assetName));
