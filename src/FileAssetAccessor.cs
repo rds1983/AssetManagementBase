@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AssetManagementBase.Utility;
+using System;
 using System.IO;
 
 namespace AssetManagementBase
@@ -39,6 +40,11 @@ namespace AssetManagementBase
 			if (AssetManager.SeparatorSymbol != Path.DirectorySeparatorChar)
 			{
 				assetName = assetName.Replace(AssetManager.SeparatorSymbol, Path.DirectorySeparatorChar);
+			}
+
+			if (assetName.IsPathRooted2())
+			{
+				return assetName;
 			}
 
 			// Asset name should always have directory separator at the start

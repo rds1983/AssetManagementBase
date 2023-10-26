@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AssetManagementBase.Utility;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -96,8 +97,13 @@ namespace AssetManagementBase
 
 		private string BuildFullPath(string assetName)
 		{
+			var isRooted = assetName.IsPathRooted2();
 			assetName = assetName.Replace('\\', SeparatorSymbol);
-			assetName = CombinePath(_currentFolder, assetName);
+
+			if (!isRooted)
+			{
+				assetName = CombinePath(_currentFolder, assetName);
+			}
 
 			if (assetName.Contains(".."))
 			{
@@ -109,12 +115,10 @@ namespace AssetManagementBase
 				var partsStack = new List<string>();
 				for(var i = 0; i < parts.Length; i++)
 				{
-					if (parts[i] == "..")
+					if (parts[i] == ".." && partsStack.Count > 0 && 
+							partsStack[partsStack.Count - 1] != ".." && partsStack[partsStack.Count - 1] != ".")
 					{
-						if (partsStack.Count > 0)
-						{
-							partsStack.RemoveAt(partsStack.Count - 1);
-						}
+						partsStack.RemoveAt(partsStack.Count - 1);
 					} else if (!string.IsNullOrEmpty(parts[i]))
 					{
 						partsStack.Add(parts[i]);
