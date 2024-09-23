@@ -3,8 +3,8 @@ name: Build & Publish Beta
 on:
     push:
         paths:
-            - 'src/**'
-            - 'tests/**'
+            - 'AssetManagementBase/**'
+            - 'AssetManagementBase.Tests/**'
     workflow_dispatch:
 
 jobs:
