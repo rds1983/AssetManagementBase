@@ -84,6 +84,11 @@ namespace AssetManagementBase
 				}
 			}
 
+			if (AMBConfiguration.Logger != null)
+			{
+				AMBConfiguration.Logger($"AMB: Loading asset '{assetName}' of type '{typeof(T).Name}' from '{_core.Name}'");
+			}
+
 			var result = loader(assetManager, assetName, settings, tag);
 
 			if (storeInCache)

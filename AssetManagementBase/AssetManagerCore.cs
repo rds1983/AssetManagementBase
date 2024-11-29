@@ -8,6 +8,8 @@ namespace AssetManagementBase
 	{
 		private readonly IAssetAccessor _assetAccessor;
 
+		public string Name => _assetAccessor.Name;
+
 		public Dictionary<string, object> Cache { get; } = new Dictionary<string, object>();
 
 		public AssetManagerCore(IAssetAccessor assetOpener)

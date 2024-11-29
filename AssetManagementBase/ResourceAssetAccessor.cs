@@ -12,6 +12,8 @@ namespace AssetManagementBase
 		private readonly string _prefix;
 		private readonly HashSet<string> _resourceNames;
 
+		public string Name => $"Res:{_assembly.GetName().Name}/{_prefix}";
+
 		public ResourceAssetAccessor(Assembly assembly, string prefix, bool prependAssemblyName)
 		{
 			_assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));

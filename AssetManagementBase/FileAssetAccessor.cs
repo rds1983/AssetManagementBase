@@ -1,12 +1,15 @@
 ﻿using AssetManagementBase.Utility;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace AssetManagementBase
 {
 	internal class FileAssetAccessor : IAssetAccessor
 	{
 		private readonly string _baseFolder;
+
+		public string Name => $"File:{_baseFolder}";
 
 		public FileAssetAccessor(string baseFolder)
 		{
