@@ -22,4 +22,4 @@ jobs:
     - name: Install NuGet
       uses: NuGet/setup-nuget@v1
     - name: Publish AssetManagementBase to NuGet
-      run: nuget.exe push src\bin\Release\AssetManagementBase.*.nupkg ${{secrets.NUGET_APIKEY}} -Source https://api.nuget.org/v3/index.json
+      run: nuget.exe push AssetManagementBase\src\bin\Release\AssetManagementBase.*.nupkg ${{secrets.NUGET_APIKEY}} -Source https://api.nuget.org/v3/index.json
