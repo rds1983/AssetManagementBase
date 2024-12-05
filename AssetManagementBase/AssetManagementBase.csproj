@@ -6,7 +6,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/rds1983/AssetManagementBase</PackageProjectUrl>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.6.8</Version>
+    <Version>0.6.9</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

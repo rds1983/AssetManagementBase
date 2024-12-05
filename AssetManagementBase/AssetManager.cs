@@ -114,8 +114,6 @@ namespace AssetManagementBase
 			{
 				// Remove ".."
 				var parts = assetName.Split(SeparatorSymbol);
-				var sb = new StringBuilder();
-				sb.Append(SeparatorSymbol);
 
 				var partsStack = new List<string>();
 				for(var i = 0; i < parts.Length; i++)
@@ -130,7 +128,13 @@ namespace AssetManagementBase
 					}
 				}
 
-				assetName = SeparatorSymbol + (string.Join(SeparatorString, partsStack));
+				if (assetName.StartsWith(SeparatorString))
+				{
+					assetName = SeparatorSymbol + string.Join(SeparatorString, partsStack);
+				} else
+				{
+					assetName = string.Join(SeparatorString, partsStack);
+				}
 			}
 
 			return assetName;
