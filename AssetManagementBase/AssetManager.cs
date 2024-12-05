@@ -1,9 +1,7 @@
 ﻿using AssetManagementBase.Utility;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace AssetManagementBase
 {
@@ -11,18 +9,16 @@ namespace AssetManagementBase
 
 	public class AssetManager
 	{
-		internal const char SeparatorSymbol = '/';
-		internal const string SeparatorString = "/";
-
 		private readonly AssetManagerCore _core;
-		private readonly string _currentFolder = SeparatorString;
+		private readonly string _currentFolder = string.Empty;
 
 		public string CurrentFolder => _currentFolder;
 		public Dictionary<string, object> Cache => _core.Cache;
 
-		public AssetManager(IAssetAccessor assetAccesssor)
+		public AssetManager(IAssetAccessor assetAccesssor, string currentFolder)
 		{
-			_core = new AssetManagerCore(assetAccesssor);
+			_core = new AssetManagerCore(assetAccesssor, currentFolder);
+			_currentFolder = currentFolder.RemoveSeparatorFromEnd();
 		}
 
 		internal AssetManager(AssetManagerCore core, string currentFolder)
@@ -53,6 +49,25 @@ namespace AssetManagementBase
 		public byte[] ReadAsByteArray(string assetName) => _core.ReadAsByteArray(BuildFullPath(assetName));
 
 
+		private string BuildFullPath(string assetName)
+		{
+			assetName = assetName.FixFilePath();
+
+			// Process reset path string
+			if (assetName.StartsWith(PathUtils.ResetPathString))
+			{
+				assetName = assetName.Substring(1).RemoveSeparatorFromStart();
+				assetName = PathUtils.CombinePath(_core.BaseFolder, assetName);
+			}
+			else if (!Path.IsPathRooted(assetName))
+			{
+				assetName = PathUtils.CombinePath(_currentFolder, assetName);
+			}
+
+			// Fix '..'
+			return PathUtils.ProcessPath(assetName);
+		}
+
 		public bool IsCached(string assetName, IAssetSettings settings = null)
 		{
 			assetName = BuildFullPath(assetName);
@@ -63,8 +78,8 @@ namespace AssetManagementBase
 
 		public T UseLoader<T>(AssetLoader<T> loader, string assetName, IAssetSettings settings = null, object tag = null, bool storeInCache = true)
 		{
-			assetName = BuildFullPath(assetName);
-			var cacheKey = BuildCacheKey(assetName, settings);
+			var fullPath = BuildFullPath(assetName);
+			var cacheKey = BuildCacheKey(fullPath, settings);
 
 			object cached;
 			if (_core.Cache.TryGetValue(cacheKey, out cached))
@@ -74,19 +89,21 @@ namespace AssetManagementBase
 			}
 
 			var assetManager = this;
-			var separatorIndex = assetName.LastIndexOf(SeparatorSymbol);
+
+			var separatorIndex = fullPath.LastIndexOf(PathUtils.SeparatorSymbol);
 			if (separatorIndex != -1)
 			{
-				var assetFolder = assetName.Substring(0, separatorIndex);
-				if (!string.IsNullOrEmpty(assetFolder))
+				var assetFolder = fullPath.Substring(0, separatorIndex);
+				if (!string.IsNullOrEmpty(assetFolder) && assetFolder != _currentFolder)
 				{
 					assetManager = new AssetManager(_core, assetFolder);
+					assetName = fullPath.Substring(separatorIndex + 1);
 				}
 			}
 
 			if (AMBConfiguration.Logger != null)
 			{
-				AMBConfiguration.Logger($"AMB: Loading asset '{assetName}' of type '{typeof(T).Name}' from '{_core.Name}'");
+				AMBConfiguration.Logger($"AMB: Loading asset '{fullPath}' of type '{typeof(T).Name}' from '{_core.Name}'");
 			}
 
 			var result = loader(assetManager, assetName, settings, tag);
@@ -98,46 +115,6 @@ namespace AssetManagementBase
 			}
 
 			return result;
-		}
-
-		private string BuildFullPath(string assetName)
-		{
-			var isRooted = assetName.IsPathRooted2();
-			assetName = assetName.Replace('\\', SeparatorSymbol);
-
-			if (!isRooted)
-			{
-				assetName = CombinePath(_currentFolder, assetName);
-			}
-
-			if (assetName.Contains(".."))
-			{
-				// Remove ".."
-				var parts = assetName.Split(SeparatorSymbol);
-
-				var partsStack = new List<string>();
-				for(var i = 0; i < parts.Length; i++)
-				{
-					if (parts[i] == ".." && partsStack.Count > 0 && 
-							partsStack[partsStack.Count - 1] != ".." && partsStack[partsStack.Count - 1] != ".")
-					{
-						partsStack.RemoveAt(partsStack.Count - 1);
-					} else if (!string.IsNullOrEmpty(parts[i]))
-					{
-						partsStack.Add(parts[i]);
-					}
-				}
-
-				if (assetName.StartsWith(SeparatorString))
-				{
-					assetName = SeparatorSymbol + string.Join(SeparatorString, partsStack);
-				} else
-				{
-					assetName = string.Join(SeparatorString, partsStack);
-				}
-			}
-
-			return assetName;
 		}
 
 		private static string BuildCacheKey(string assetName, IAssetSettings settings)
@@ -152,33 +129,10 @@ namespace AssetManagementBase
 			return cacheKey;
 		}
 
-		private static string CombinePath(string _base, string url)
-		{
-			if (string.IsNullOrEmpty(_base))
-			{
-				return url;
-			}
+		public static AssetManager CreateFileAssetManager(string baseFolder) =>
+			new AssetManager(new FileAssetAccessor(), baseFolder.FixFilePath());
 
-			if (string.IsNullOrEmpty(url))
-			{
-				return _base;
-			}
-
-			if (url[0] == SeparatorSymbol)
-			{
-				// Path is rooted
-				return url;
-			}
-
-			if (_base[_base.Length - 1] == SeparatorSymbol)
-			{
-				return _base + url;
-			}
-
-			return _base + SeparatorSymbol + url;
-		}
-
-		public static AssetManager CreateFileAssetManager(string baseFolder) => new AssetManager(new FileAssetAccessor(baseFolder));
-		public static AssetManager CreateResourceAssetManager(Assembly assembly, string prefix, bool prependAssemblyName = true) => new AssetManager(new ResourceAssetAccessor(assembly, prefix, prependAssemblyName));
+		public static AssetManager CreateResourceAssetManager(Assembly assembly, string prefix, bool prependAssemblyName = true) =>
+			new AssetManager(new ResourceAssetAccessor(assembly), ResourceAssetAccessor.BuildPrefix(assembly, prefix, prependAssemblyName));
 	}
 }

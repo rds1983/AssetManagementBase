@@ -6,53 +6,37 @@ namespace AssetManagementBase
 {
 	internal class FileAssetAccessor : IAssetAccessor
 	{
-		private readonly string _baseFolder;
+		public string Name => $"File";
 
-		public string Name => $"File:{_baseFolder}";
-
-		public FileAssetAccessor(string baseFolder)
+		public FileAssetAccessor()
 		{
-			// Base folder shouldn't have separator char at the end
-			if (!string.IsNullOrEmpty(baseFolder) && baseFolder.EndsWith(Path.DirectorySeparatorChar.ToString()))
-			{
-				baseFolder = baseFolder.Substring(0, baseFolder.Length - 1);
-			}
-
-			_baseFolder = baseFolder;
 		}
 
-		public bool Exists(string assetName)
+		private static string ToPlatformPath(string path)
 		{
-			return File.Exists(BuildFullPath(assetName));
+			// Update separators
+			if (PathUtils.SeparatorSymbol != Path.DirectorySeparatorChar)
+			{
+				path = path.Replace(PathUtils.SeparatorSymbol, Path.DirectorySeparatorChar);
+			}
+
+			return path;
 		}
 
-		public Stream Open(string assetName)
+		public bool Exists(string path)
 		{
-			assetName = BuildFullPath(assetName);
-			if (!File.Exists(assetName))
-			{
-				throw new Exception($"Could not find file '{assetName}'");
-			}
-
-			return File.OpenRead(assetName);
+			return File.Exists(ToPlatformPath(path));
 		}
 
-		private string BuildFullPath(string assetName)
+		public Stream Open(string path)
 		{
-			if (AssetManager.SeparatorSymbol != Path.DirectorySeparatorChar)
+			path = ToPlatformPath(path);
+			if (!File.Exists(path))
 			{
-				assetName = assetName.Replace(AssetManager.SeparatorSymbol, Path.DirectorySeparatorChar);
+				throw new Exception($"Could not find file '{path}'");
 			}
 
-			if (assetName.IsPathRooted2())
-			{
-				return assetName;
-			}
-
-			// Asset name should always have directory separator at the start
-			// While base folder shouldnt
-			// Hence such combine should work
-			return _baseFolder + assetName;
+			return File.OpenRead(path);
 		}
 	}
 }

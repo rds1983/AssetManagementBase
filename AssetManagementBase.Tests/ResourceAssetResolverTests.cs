@@ -12,16 +12,12 @@ namespace AssetManagementBase.Tests
 		private static void TestResourceAccess(string prefix, bool prependAssemblyName, string assetName)
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, prefix, prependAssemblyName);
-			var text = assetManager.LoadString(assetName);
+			var text = assetManager.ReadAsString(assetName);
 			Assert.AreEqual(text, "Test");
-			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.IsCached(assetName));
 
 			// Test second access of the same resource
-			text = assetManager.LoadString(assetName);
+			text = assetManager.ReadAsString(assetName);
 			Assert.AreEqual(text, "Test");
-			Assert.AreEqual(assetManager.Cache.Count, 1);
-			Assert.IsTrue(assetManager.IsCached(assetName));
 		}
 
 		[Test]
@@ -31,14 +27,14 @@ namespace AssetManagementBase.Tests
 
 			Assert.Throws<Exception>(() =>
 			{
-				var text = assetManager.LoadString("test.txt");
+				var text = assetManager.ReadAsString("test.txt");
 			});
 		}
 
 		[Test]
 		public void TestPathRooted()
 		{
-			TestResourceAccess("Resources", true, "/test.txt");
+			TestResourceAccess("Resources", true, "@test.txt");
 		}
 
 		[Test]
@@ -71,9 +67,9 @@ namespace AssetManagementBase.Tests
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources.", true);
 
 			Assert.IsTrue(assetManager.Exists("test.txt"));
-			Assert.IsTrue(assetManager.Exists("/test.txt"));
+			Assert.IsTrue(assetManager.Exists("@test.txt"));
 			Assert.IsTrue(assetManager.Exists("sub/test.txt"));
-			Assert.IsTrue(assetManager.Exists("/sub/test.txt"));
+			Assert.IsTrue(assetManager.Exists("@sub/test.txt"));
 			Assert.IsFalse(assetManager.Exists("test2.txt"));
 		}
 	}

@@ -6,7 +6,7 @@ namespace AssetManagementBase
 	{
 		string Name { get; }
 
-		bool Exists(string assetName);
-		Stream Open(string assetName);
+		bool Exists(string path);
+		Stream Open(string path);
 	}
 }

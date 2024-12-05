@@ -6,50 +6,36 @@ using AssetManagementBase.Utility;
 
 namespace AssetManagementBase
 {
-	internal class ResourceAssetAccessor: IAssetAccessor
+	internal class ResourceAssetAccessor : IAssetAccessor
 	{
 		private readonly Assembly _assembly;
-		private readonly string _prefix;
 		private readonly HashSet<string> _resourceNames;
 
-		public string Name => $"Res:{_assembly.GetName().Name}/{_prefix}";
+		public string Name => $"Res:{_assembly.GetName().Name}";
 
-		public ResourceAssetAccessor(Assembly assembly, string prefix, bool prependAssemblyName)
+		public ResourceAssetAccessor(Assembly assembly)
 		{
 			_assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
 			_resourceNames = new HashSet<string>(assembly.GetManifestResourceNames());
+		}
 
+		private string ToPlatformPath(string fullPath) => fullPath.Replace(PathUtils.SeparatorSymbol, '.');
+
+		public bool Exists(string path) => _resourceNames.Contains(ToPlatformPath(path));
+
+		public Stream Open(string path) => _assembly.OpenResourceStream(ToPlatformPath(path));
+
+		public static string BuildPrefix(Assembly assembly, string prefix, bool prependAssemblyName)
+		{
 			if (!string.IsNullOrEmpty(prefix))
 			{
 				if (prependAssemblyName)
 				{
 					prefix = assembly.GetName().Name + "." + prefix;
 				}
-
-				// Prefix shouldn't have dot at the end
-				if (prefix.EndsWith("."))
-				{
-					prefix = prefix.Substring(0, prefix.Length - 1);
-				}
 			}
 
-			_prefix = prefix;
-		}
-
-		public bool Exists(string assetName) => _resourceNames.Contains(BuildResourcePath(assetName));
-
-		public Stream Open(string assetName) => _assembly.OpenResourceStream(BuildResourcePath(assetName));
-
-		private string BuildResourcePath(string assetName)
-		{
-			assetName =	assetName.Replace(AssetManager.SeparatorSymbol, '.');
-
-			// Asset name should always have dot at the end
-			// While base folder shouldnt
-			// Hence such combine should work
-			assetName = _prefix + assetName;
-
-			return assetName;
+			return prefix.Replace('.', PathUtils.SeparatorSymbol);
 		}
 	}
 }

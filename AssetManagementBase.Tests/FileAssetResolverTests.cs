@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.IO;
 
 namespace AssetManagementBase.Tests
 {
@@ -39,7 +40,7 @@ namespace AssetManagementBase.Tests
 		[Test]
 		public void LoadUserProfilePathRooted()
 		{
-			TestUserProfile("/userProfile.xml");
+			TestUserProfile("@userProfile.xml");
 		}
 
 
@@ -60,7 +61,8 @@ namespace AssetManagementBase.Tests
 			var assetManager = CreateAssetManager();
 
 			Assert.IsTrue(assetManager.Exists("userProfile.xml"));
-			Assert.IsTrue(assetManager.Exists("/userProfile.xml"));
+			Assert.IsTrue(assetManager.Exists("@userProfile.xml"));
+			Assert.IsTrue(assetManager.Exists(Path.Combine(Utility.ExecutingAssemblyDirectory, "userProfile.xml")));
 			Assert.IsFalse(assetManager.Exists("userProfile2.xml"));
 		}
 	}

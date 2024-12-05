@@ -1,14 +1,104 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 
 namespace AssetManagementBase.Utility
 {
 	internal static class PathUtils
 	{
-		public static bool IsPathRooted2(this string path)
-		{
-			var drive = Path.GetPathRoot(path);
+		public const char ResetPathSymbol = '@';
+		public const string ResetPathString = "@";
+		public const char SeparatorSymbol = '/';
+		public const string SeparatorString = "/";
 
-			return !string.IsNullOrEmpty(drive) && drive[0] != '/' && drive[0] != '\\';
+		public static string FixFilePath(this string path)
+		{
+			if (!string.IsNullOrEmpty(path))
+			{
+				path = path.Replace('\\', SeparatorSymbol);
+			}
+
+			return path;
+		}
+
+		public static string RemoveSeparatorFromStart(this string path)
+		{
+			if (!string.IsNullOrEmpty(path) && path.StartsWith(SeparatorString))
+			{
+				path = path.Substring(1);
+			}
+
+			return path;
+		}
+
+		public static string RemoveSeparatorFromEnd(this string path)
+		{
+			if (!string.IsNullOrEmpty(path) && path.EndsWith(SeparatorString))
+			{
+				path = path.Substring(0, path.Length - 1);
+			}
+
+			return path;
+		}
+
+
+		public static string CombinePath(string _base, string url)
+		{
+			if (string.IsNullOrEmpty(_base))
+			{
+				return url;
+			}
+
+			if (string.IsNullOrEmpty(url))
+			{
+				return _base;
+			}
+
+			if (url[0] == SeparatorSymbol)
+			{
+				// Path is rooted
+				return url;
+			}
+
+			if (_base[_base.Length - 1] == SeparatorSymbol)
+			{
+				return _base + url;
+			}
+
+			return _base + SeparatorSymbol + url;
+		}
+
+		public static string ProcessPath(string path)
+		{
+			if (!path.Contains(".."))
+			{
+				return path;
+			}
+
+			// Remove ".."
+			var parts = path.Split(SeparatorSymbol);
+			var partsStack = new List<string>();
+			for (var i = 0; i < parts.Length; i++)
+			{
+				if (parts[i] == ".." && partsStack.Count > 0 &&
+						partsStack[partsStack.Count - 1] != ".." && partsStack[partsStack.Count - 1] != ".")
+				{
+					partsStack.RemoveAt(partsStack.Count - 1);
+				}
+				else if (!string.IsNullOrEmpty(parts[i]))
+				{
+					partsStack.Add(parts[i]);
+				}
+			}
+
+			if (path.StartsWith(SeparatorString))
+			{
+				path = SeparatorSymbol + string.Join(SeparatorString, partsStack);
+			}
+			else
+			{
+				path = string.Join(SeparatorString, partsStack);
+			}
+
+			return path;
 		}
 	}
 }

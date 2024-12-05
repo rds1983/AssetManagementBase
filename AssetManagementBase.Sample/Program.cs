@@ -6,7 +6,7 @@
 		{
 			var assetManager = AssetManager.CreateFileAssetManager(Utility.ExecutingAssemblyDirectory);
 
-			var userProfile = assetManager.LoadUserProfile("userProfile.xml");
+			var userProfile = assetManager.LoadUserProfile("@userProfile.xml");
 		}
 	}
 }
