@@ -4,8 +4,6 @@ namespace AssetManagementBase.Utility
 {
 	internal static class PathUtils
 	{
-		public const char ResetPathSymbol = '@';
-		public const string ResetPathString = "@";
 		public const char SeparatorSymbol = '/';
 		public const string SeparatorString = "/";
 
@@ -19,18 +17,11 @@ namespace AssetManagementBase.Utility
 			return path;
 		}
 
-		public static string RemoveSeparatorFromStart(this string path)
+		public static string FixFolderPath(this string path)
 		{
-			if (!string.IsNullOrEmpty(path) && path.StartsWith(SeparatorString))
-			{
-				path = path.Substring(1);
-			}
+			path = path.FixFilePath();
 
-			return path;
-		}
-
-		public static string RemoveSeparatorFromEnd(this string path)
-		{
+			// Remove separator from the end
 			if (!string.IsNullOrEmpty(path) && path.EndsWith(SeparatorString))
 			{
 				path = path.Substring(0, path.Length - 1);
@@ -38,7 +29,6 @@ namespace AssetManagementBase.Utility
 
 			return path;
 		}
-
 
 		public static string CombinePath(string _base, string url)
 		{
@@ -53,12 +43,6 @@ namespace AssetManagementBase.Utility
 			}
 
 			if (url[0] == SeparatorSymbol)
-			{
-				// Path is rooted
-				return url;
-			}
-
-			if (_base[_base.Length - 1] == SeparatorSymbol)
 			{
 				return _base + url;
 			}
@@ -78,8 +62,7 @@ namespace AssetManagementBase.Utility
 			var partsStack = new List<string>();
 			for (var i = 0; i < parts.Length; i++)
 			{
-				if (parts[i] == ".." && partsStack.Count > 0 &&
-						partsStack[partsStack.Count - 1] != ".." && partsStack[partsStack.Count - 1] != ".")
+				if (parts[i] == ".." && partsStack.Count > 0 && partsStack[partsStack.Count - 1] != ".." && partsStack[partsStack.Count - 1] != ".")
 				{
 					partsStack.RemoveAt(partsStack.Count - 1);
 				}

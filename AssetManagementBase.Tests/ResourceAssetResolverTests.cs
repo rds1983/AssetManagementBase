@@ -21,7 +21,7 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Test]
-		public void TestWrongPath()
+		public void WrongPath()
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "WrongPath.Resources");
 
@@ -32,44 +32,44 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Test]
-		public void TestPathRooted()
+		public void PathRooted()
 		{
-			TestResourceAccess("Resources", true, "@test.txt");
+			TestResourceAccess("Resources", true, "/test.txt");
 		}
 
 		[Test]
-		public void TestWithoutEndDot()
+		public void WithoutEndDot()
 		{
 			TestResourceAccess("Resources", true, "test.txt");
 		}
 
 		[Test]
-		public void TestWithEndDot()
+		public void WithEndDot()
 		{
 			TestResourceAccess("Resources.", true, "test.txt");
 		}
 
 		[Test]
-		public void TestSubFolder()
+		public void SubFolder()
 		{
 			TestResourceAccess("Resources.", true, "sub/test.txt");
 		}
 
 		[Test]
-		public void TestWithoutPrependAssemblyName()
+		public void WithoutPrependAssemblyName()
 		{
 			TestResourceAccess("AssetManagementBase.Tests.Resources", false, "test.txt");
 		}
 
 		[Test]
-		public void TestResourceExistance()
+		public void ResourceExistance()
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources.", true);
 
 			Assert.IsTrue(assetManager.Exists("test.txt"));
-			Assert.IsTrue(assetManager.Exists("@test.txt"));
+			Assert.IsTrue(assetManager.Exists("/test.txt"));
 			Assert.IsTrue(assetManager.Exists("sub/test.txt"));
-			Assert.IsTrue(assetManager.Exists("@sub/test.txt"));
+			Assert.IsTrue(assetManager.Exists("/sub/test.txt"));
 			Assert.IsFalse(assetManager.Exists("test2.txt"));
 		}
 	}
