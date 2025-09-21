@@ -21,9 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\AssetManagementBase\AssetManagementBase.csproj" />
   </ItemGroup>  
-
+  
   <ItemGroup>
-    <None Update="userProfile.xml">
+    <None Update="FileAssets\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>  

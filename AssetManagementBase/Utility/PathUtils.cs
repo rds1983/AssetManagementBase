@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace AssetManagementBase.Utility
 {
 	internal static class PathUtils
 	{
+		public const string RootedPathSymbol = "@";
 		public const char SeparatorSymbol = '/';
 		public const string SeparatorString = "/";
 
@@ -82,6 +84,13 @@ namespace AssetManagementBase.Utility
 			}
 
 			return path;
+		}
+
+		public static bool IsWindowsPathRooted(this string path)
+		{
+			var drive = Path.GetPathRoot(path);
+
+			return !string.IsNullOrEmpty(drive) && drive[0] != '/' && drive[0] != '\\';
 		}
 	}
 }
