@@ -53,7 +53,8 @@ namespace AssetManagementBase.Tests
 				"/files/../files/../userProfile.xml",
 				"files/files/../../userProfile.xml",
 				"/files/files/../../userProfile.xml",
-				"@" + Path.Combine(AssetPath, "userProfile.xml")
+				"@" + Path.Combine(AssetPath, "userProfile.xml"),
+				"@" + Path.Combine(AssetPath, "files/../userProfile.xml")
 			]);
 
 			TestUserProfile
@@ -66,7 +67,8 @@ namespace AssetManagementBase.Tests
 				"/files/files/../files/../userProfile.xml",
 				"files/files/files/../../userProfile.xml",
 				"/files/files/files/../../userProfile.xml",
-				"@" + Path.Combine(AssetPath, "files/userProfile.xml")
+				"@" + Path.Combine(AssetPath, "files/userProfile.xml"),
+				"@" + Path.Combine(AssetPath, "files/files/../userProfile.xml")
 			]);
 		}
 
