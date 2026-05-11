@@ -24,7 +24,7 @@ namespace AssetManagementBase.Tests
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "WrongPath.Resources");
 
-			_ = Assert.Throws<Exception>(() =>
+			_ = Assert.Throws<AssetNotFoundException>(() =>
 			{
 				var text = assetManager.ReadAsString("test.txt");
 			});

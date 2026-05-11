@@ -33,7 +33,7 @@ namespace AssetManagementBase
 			path = ToPlatformPath(path);
 			if (!File.Exists(path))
 			{
-				throw new Exception($"Could not find file '{path}'");
+				throw new AssetNotFoundException(path);
 			}
 
 			return File.OpenRead(path);

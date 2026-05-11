@@ -71,11 +71,11 @@ namespace AssetManagementBase.Tests
 
 
 		[Fact]
-		public void WrongPath_ThrowsException()
+		public void WrongPath_ThrowsAssetNotFoundException()
 		{
 			var assetManager = CreateAssetManager();
 
-			_ = Assert.Throws<Exception>(() =>
+			_ = Assert.Throws<AssetNotFoundException>(() =>
 			{
 				var userProfile = assetManager.LoadUserProfile("userProfile2.xml");
 			});
@@ -148,14 +148,14 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadEmployee_WithWrongJobPath_ThrowsException()
+		public void LoadEmployee_WithWrongJobPath_ThrowsAssetNotFoundException()
 		{
 			var assetManager = CreateAssetManager();
 
 			Assert.True(assetManager.Exists("employee_wrong_path.xml"));
 
 			// Loading employee should throw because the referenced job doesn't exist
-			_ = Assert.Throws<Exception>(() =>
+			_ = Assert.Throws<AssetNotFoundException>(() =>
 			{
 				var employee = assetManager.LoadEmployee("employee_wrong_path.xml");
 			});
