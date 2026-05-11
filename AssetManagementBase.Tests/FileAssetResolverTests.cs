@@ -4,10 +4,8 @@ using System.IO;
 
 namespace AssetManagementBase.Tests
 {
-	public class FileAssetResolverTests
+	public class FileAssetResolverTests : AssetResolverTestBase
 	{
-		private static string AssetPath = Path.Combine(Utility.ExecutingAssemblyDirectory, "FileAssets");
-		private static AssetManager CreateExecutingDirectoryAssetManager() => AssetManager.CreateFileAssetManager(AssetPath);
 
 		private static void TestUserProfile(UserProfile userProfile)
 		{
@@ -17,7 +15,7 @@ namespace AssetManagementBase.Tests
 
 		private static void TestUserProfile(string[] assetNames)
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			// All provided asset names should point to same asset
 			for (var i = 0; i < assetNames.Length; ++i)
@@ -39,7 +37,7 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadUserProfile()
+		public void LoadUserProfile_Various_PathFormats_ResolveToSameAsset()
 		{
 			// All these expression point to one file
 			TestUserProfile
@@ -73,9 +71,9 @@ namespace AssetManagementBase.Tests
 
 
 		[Fact]
-		public void WrongPath()
+		public void WrongPath_ThrowsException()
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			_ = Assert.Throws<Exception>(() =>
 			{
@@ -84,9 +82,9 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadJobAsset()
+		public void LoadJobAsset_ReturnsValidJob()
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			Assert.True(assetManager.Exists("job.xml"));
 			var job = assetManager.LoadJob("job.xml");
@@ -98,9 +96,9 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadEmployeeWithRecursiveJobLoading()
+		public void LoadEmployee_WithRelativeJobPath_LoadsRecursively()
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			Assert.True(assetManager.Exists("employee.xml"));
 			var employee = assetManager.LoadEmployee("employee.xml");
@@ -127,9 +125,9 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadEmployeeWithAbsoluteJobPath()
+		public void LoadEmployee_WithAbsoluteJobPath_ResolvesFromBase()
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			Assert.True(assetManager.Exists("employee_absolute_path.xml"));
 			var employee = assetManager.LoadEmployee("employee_absolute_path.xml");
@@ -150,9 +148,9 @@ namespace AssetManagementBase.Tests
 		}
 
 		[Fact]
-		public void LoadEmployeeWithWrongJobPathThrows()
+		public void LoadEmployee_WithWrongJobPath_ThrowsException()
 		{
-			var assetManager = CreateExecutingDirectoryAssetManager();
+			var assetManager = CreateAssetManager();
 
 			Assert.True(assetManager.Exists("employee_wrong_path.xml"));
 
