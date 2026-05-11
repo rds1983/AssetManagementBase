@@ -1,10 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.IO;
 
 namespace AssetManagementBase.Tests
 {
-	[TestFixture]
 	public class FileAssetResolverTests
 	{
 		private static string AssetPath = Path.Combine(Utility.ExecutingAssemblyDirectory, "FileAssets");
@@ -12,8 +11,8 @@ namespace AssetManagementBase.Tests
 
 		private static void TestUserProfile(UserProfile userProfile)
 		{
-			Assert.AreEqual(userProfile.Name, "AssetManagementBase");
-			Assert.AreEqual(userProfile.Score, 10000);
+			Assert.Equal("AssetManagementBase", userProfile.Name);
+			Assert.Equal(10000, userProfile.Score);
 		}
 
 		private static void TestUserProfile(string[] assetNames)
@@ -24,22 +23,22 @@ namespace AssetManagementBase.Tests
 			for (var i = 0; i < assetNames.Length; ++i)
 			{
 				var assetName = assetNames[i];
-				Assert.IsTrue(assetManager.Exists(assetName));
+				Assert.True(assetManager.Exists(assetName));
 				var userProfile = assetManager.LoadUserProfile(assetName);
 
 				TestUserProfile(userProfile);
-				Assert.AreEqual(assetManager.Cache.Count, 1);
-				Assert.IsTrue(assetManager.IsCached(assetName));
+				Assert.Equal(1, assetManager.Cache.Count);
+				Assert.True(assetManager.IsCached(assetName));
 
 				// Test second access of the same resource
 				userProfile = assetManager.LoadUserProfile(assetName);
 				TestUserProfile(userProfile);
-				Assert.AreEqual(assetManager.Cache.Count, 1);
-				Assert.IsTrue(assetManager.IsCached(assetName));
+				Assert.Equal(1, assetManager.Cache.Count);
+				Assert.True(assetManager.IsCached(assetName));
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void LoadUserProfile()
 		{
 			// All these expression point to one file
@@ -73,14 +72,94 @@ namespace AssetManagementBase.Tests
 		}
 
 
-		[Test]
+		[Fact]
 		public void WrongPath()
 		{
 			var assetManager = CreateExecutingDirectoryAssetManager();
 
-			Assert.Throws<Exception>(() =>
+			_ = Assert.Throws<Exception>(() =>
 			{
 				var userProfile = assetManager.LoadUserProfile("userProfile2.xml");
+			});
+		}
+
+		[Fact]
+		public void LoadJobAsset()
+		{
+			var assetManager = CreateExecutingDirectoryAssetManager();
+
+			Assert.True(assetManager.Exists("job.xml"));
+			var job = assetManager.LoadJob("job.xml");
+
+			Assert.Equal("Senior Developer", job.Title);
+			Assert.Equal(120000m, job.Salary);
+			Assert.Equal(1, assetManager.Cache.Count);
+			Assert.True(assetManager.IsCached("job.xml"));
+		}
+
+		[Fact]
+		public void LoadEmployeeWithRecursiveJobLoading()
+		{
+			var assetManager = CreateExecutingDirectoryAssetManager();
+
+			Assert.True(assetManager.Exists("employee.xml"));
+			var employee = assetManager.LoadEmployee("employee.xml");
+
+			// Verify employee data
+			Assert.Equal("John Smith", employee.Name);
+			Assert.Equal("job.xml", employee.JobPath);
+
+			// Verify recursively loaded job
+			Assert.NotNull(employee.Job);
+			Assert.Equal("Senior Developer", employee.Job.Title);
+			Assert.Equal(120000m, employee.Job.Salary);
+
+			// Both employee and job should be cached
+			Assert.Equal(2, assetManager.Cache.Count);
+			Assert.True(assetManager.IsCached("employee.xml"));
+			Assert.True(assetManager.IsCached("job.xml"));
+
+			// Second access should use cache
+			var cachedEmployee = assetManager.LoadEmployee("employee.xml");
+			Assert.Equal(2, assetManager.Cache.Count);
+			Assert.Equal(cachedEmployee.Name, employee.Name);
+			Assert.Equal(cachedEmployee.Job.Title, employee.Job.Title);
+		}
+
+		[Fact]
+		public void LoadEmployeeWithAbsoluteJobPath()
+		{
+			var assetManager = CreateExecutingDirectoryAssetManager();
+
+			Assert.True(assetManager.Exists("employee_absolute_path.xml"));
+			var employee = assetManager.LoadEmployee("employee_absolute_path.xml");
+
+			// Verify employee data
+			Assert.Equal("Jane Doe", employee.Name);
+			Assert.Equal("/job.xml", employee.JobPath);
+
+			// Verify job loaded via absolute path
+			Assert.NotNull(employee.Job);
+			Assert.Equal("Senior Developer", employee.Job.Title);
+			Assert.Equal(120000m, employee.Job.Salary);
+
+			// Both assets should be cached
+			Assert.Equal(2, assetManager.Cache.Count);
+			Assert.True(assetManager.IsCached("employee_absolute_path.xml"));
+			Assert.True(assetManager.IsCached("/job.xml"));
+		}
+
+		[Fact]
+		public void LoadEmployeeWithWrongJobPathThrows()
+		{
+			var assetManager = CreateExecutingDirectoryAssetManager();
+
+			Assert.True(assetManager.Exists("employee_wrong_path.xml"));
+
+			// Loading employee should throw because the referenced job doesn't exist
+			_ = Assert.Throws<Exception>(() =>
+			{
+				var employee = assetManager.LoadEmployee("employee_wrong_path.xml");
 			});
 		}
 	}

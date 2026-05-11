@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Employee>
+  <Name>John Smith</Name>
+  <JobPath>job.xml</JobPath>
+</Employee>

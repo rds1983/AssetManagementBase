@@ -59,7 +59,7 @@ namespace AssetManagementBase
 			}
 			else if (assetName.StartsWith(PathUtils.RootedPathSymbol))
 			{
-				// This symbol at the beginnig also specifies the path is rooted
+				// This symbol at the beginning also specifies the path is rooted
 				assetName = assetName.Substring(1);
 			}
 			else if (assetName.StartsWith(PathUtils.SeparatorString))

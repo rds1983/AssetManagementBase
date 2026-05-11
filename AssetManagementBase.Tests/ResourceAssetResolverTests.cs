@@ -1,10 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.Reflection;
 
 namespace AssetManagementBase.Tests
 {
-	[TestFixture]
 	public class ResourceAssetResolverTests
 	{
 		private static readonly Assembly _assembly = typeof(ResourceAssetResolverTests).Assembly;
@@ -13,64 +12,64 @@ namespace AssetManagementBase.Tests
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, prefix, prependAssemblyName);
 			var text = assetManager.ReadAsString(assetName);
-			Assert.AreEqual(text, "Test");
+			Assert.Equal("Test", text);
 
 			// Test second access of the same resource
 			text = assetManager.ReadAsString(assetName);
-			Assert.AreEqual(text, "Test");
+			Assert.Equal("Test", text);
 		}
 
-		[Test]
+		[Fact]
 		public void WrongPath()
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "WrongPath.Resources");
 
-			Assert.Throws<Exception>(() =>
+			_ = Assert.Throws<Exception>(() =>
 			{
 				var text = assetManager.ReadAsString("test.txt");
 			});
 		}
 
-		[Test]
+		[Fact]
 		public void PathRooted()
 		{
 			TestResourceAccess("Resources", true, "/test.txt");
 		}
 
-		[Test]
+		[Fact]
 		public void WithoutEndDot()
 		{
 			TestResourceAccess("Resources", true, "test.txt");
 		}
 
-		[Test]
+		[Fact]
 		public void WithEndDot()
 		{
 			TestResourceAccess("Resources.", true, "test.txt");
 		}
 
-		[Test]
+		[Fact]
 		public void SubFolder()
 		{
 			TestResourceAccess("Resources.", true, "sub/test.txt");
 		}
 
-		[Test]
+		[Fact]
 		public void WithoutPrependAssemblyName()
 		{
 			TestResourceAccess("AssetManagementBase.Tests.Resources", false, "test.txt");
 		}
 
-		[Test]
+		[Fact]
 		public void ResourceExistance()
 		{
 			var assetManager = AssetManager.CreateResourceAssetManager(_assembly, "Resources.", true);
 
-			Assert.IsTrue(assetManager.Exists("test.txt"));
-			Assert.IsTrue(assetManager.Exists("/test.txt"));
-			Assert.IsTrue(assetManager.Exists("sub/test.txt"));
-			Assert.IsTrue(assetManager.Exists("/sub/test.txt"));
-			Assert.IsFalse(assetManager.Exists("test2.txt"));
+			Assert.True(assetManager.Exists("test.txt"));
+			Assert.True(assetManager.Exists("/test.txt"));
+			Assert.True(assetManager.Exists("sub/test.txt"));
+			Assert.True(assetManager.Exists("/sub/test.txt"));
+			Assert.False(assetManager.Exists("test2.txt"));
 		}
 	}
 }
