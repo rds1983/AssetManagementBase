@@ -23,7 +23,16 @@ namespace AssetManagementBase
 
 		public bool Exists(string path) => _resourceNames.Contains(ToPlatformPath(path));
 
-		public Stream Open(string path) => _assembly.OpenResourceStream(ToPlatformPath(path));
+		public Stream Open(string path)
+		{
+			var platformPath = ToPlatformPath(path);
+			if (!_resourceNames.Contains(platformPath))
+			{
+				throw new AssetNotFoundException(path);
+			}
+
+			return _assembly.OpenResourceStream(platformPath);
+		}
 
 		public static string BuildPrefix(Assembly assembly, string prefix, bool prependAssemblyName)
 		{
