@@ -335,3 +335,14 @@ Console.WriteLine($"Cache entries: {assetManager.Cache.Count}");  // 3
 - The `settings` parameter passed to the loader is an `IAssetSettings` instance you provide, allowing you to customize loading behavior.
 - Common use cases include: asset transformation (color replacement, scaling, filtering), environment-specific configurations, localization/culture settings, or feature flags.
 - Settings must have consistent `BuildKey()` values across identical configurations to share cache entries effectively.  
+
+## Sponsor 
+If this project is useful for you, you can support development:
+- Boosty: https://boosty.to/rds1983
+- Telegram Wallet: https://t.me/rds1983
+
+### Crypto
+
+USDT (TON): `UQCQy6tFInPvqinE44zHY4R0rYS3niaBikkqiSyGmyoAMwyO`
+
+TON: `UQCQy6tFInPvqinE44zHY4R0rYS3niaBikkqiSyGmyoAMwyO`
