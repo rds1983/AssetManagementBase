@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <Authors>AssetManagementBaseTeam</Authors>
     <Product>AssetManagementBase</Product>
     <Description>Basic Asset Management Framework</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/rds1983/AssetManagementBase</PackageProjectUrl>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.7.3</Version>
+    <Version>0.7.4</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

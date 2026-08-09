@@ -122,7 +122,7 @@ namespace AssetManagementBase.Tests
 
 			// Should use the same cache entry (resolved to same path)
 			Assert.Same(job1, job2);
-			Assert.Equal(1, assetManager.Cache.Count);
+			Assert.Single(assetManager.Cache);
 		}
 
 		[Fact]

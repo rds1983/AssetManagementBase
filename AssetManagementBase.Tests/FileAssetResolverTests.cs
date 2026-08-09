@@ -25,13 +25,13 @@ namespace AssetManagementBase.Tests
 				var userProfile = assetManager.LoadUserProfile(assetName);
 
 				TestUserProfile(userProfile);
-				Assert.Equal(1, assetManager.Cache.Count);
+				Assert.Single(assetManager.Cache);
 				Assert.True(assetManager.IsCached(assetName));
 
 				// Test second access of the same resource
 				userProfile = assetManager.LoadUserProfile(assetName);
 				TestUserProfile(userProfile);
-				Assert.Equal(1, assetManager.Cache.Count);
+				Assert.Single(assetManager.Cache);
 				Assert.True(assetManager.IsCached(assetName));
 			}
 		}
@@ -91,7 +91,7 @@ namespace AssetManagementBase.Tests
 
 			Assert.Equal("Senior Developer", job.Title);
 			Assert.Equal(120000m, job.Salary);
-			Assert.Equal(1, assetManager.Cache.Count);
+			Assert.Single(assetManager.Cache);
 			Assert.True(assetManager.IsCached("job.xml"));
 		}
 
